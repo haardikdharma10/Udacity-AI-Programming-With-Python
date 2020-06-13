@@ -1,0 +1,374 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Mean Normalization\n",
+    "\n",
+    "In machine learning we use large amounts of data to train our models. Some machine learning algorithms may require that the data is *normalized* in order to work correctly. The idea of normalization, also known as *feature scaling*, is to ensure that all the data is on a similar scale, *i.e.* that all the data takes on a similar range of values. For example, we might have a dataset that has values between 0 and 5,000. By normalizing the data we can make the range of values be between 0 and 1.\n",
+    "\n",
+    "In this lab, you will be performing a different kind of feature scaling known as *mean normalization*. Mean normalization will scale the data, but instead of making the values be between 0 and 1, it will distribute the values evenly in some small interval around zero. For example, if we have a dataset that has values between 0 and 5,000, after mean normalization the range of values will be distributed in some small range around 0, for example between -3 to 3. Because the range of values are distributed evenly around zero, this guarantees that the average (mean) of all elements will be zero. Therefore, when you perform *mean normalization* your data will not only be scaled but it will also have an average of zero. \n",
+    "\n",
+    "# To Do:\n",
+    "\n",
+    "You will start by importing NumPy and creating a rank 2 ndarray of random integers between 0 and 5,000 (inclusive) with 1000 rows and 20 columns. This array will simulate a dataset with a wide range of values. Fill in the code below"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[1129 1342 2375 ... 3474 2883 3942]\n",
+      " [3765 4018 3950 ...   82  235 4317]\n",
+      " [3643 4513 2798 ... 3637 3658  298]\n",
+      " ...\n",
+      " [ 849 2037 2085 ... 3783  325 1168]\n",
+      " [2965 3187 3676 ... 3197 2806 1835]\n",
+      " [2499 1350  535 ...  472 1986 3300]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# import NumPy into Python\n",
+    "import numpy as np\n",
+    "\n",
+    "\n",
+    "# Create a 1000 x 20 ndarray with random integers in the half-open interval [0, 5001).\n",
+    "X = np.random.randint(0,5001, size = (1000,20))\n",
+    "# print the shape of X\n",
+    "print(X)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now that you created the array we will mean normalize it. We will perform mean normalization using the following equation:\n",
+    "\n",
+    "$\\mbox{Norm_Col}_i = \\frac{\\mbox{Col}_i - \\mu_i}{\\sigma_i}$\n",
+    "\n",
+    "where $\\mbox{Col}_i$ is the $i$th column of $X$, $\\mu_i$ is average of the values in the $i$th column of $X$, and $\\sigma_i$ is the standard deviation of the values in the $i$th column of $X$. In other words, mean normalization is performed by subtracting from each column of $X$ the average of its values, and then by dividing by the standard deviation of its values. In the space below, you will first calculate the average and standard deviation of each column of $X$. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Average of the values in each column of X\n",
+    "ave_cols = X.mean(axis = 0)\n",
+    "\n",
+    "# Standard Deviation of the values in each column of X\n",
+    "std_cols = X.std(axis = 0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If you have done the above calculations correctly, then `ave_cols` and `std_cols`, should both be vectors with shape `(20,)` since $X$ has 20 columns. You can verify this by filling the code below:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(20,)\n",
+      "(20,)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Print the shape of ave_cols\n",
+    "print(ave_cols.shape)\n",
+    "\n",
+    "\n",
+    "# Print the shape of std_cols\n",
+    "print(std_cols.shape)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can now take advantage of Broadcasting to calculate the mean normalized version of $X$ in just one line of code using the equation above. Fill in the code below"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Mean normalize X\n",
+    "X_norm = (X - ave_cols) / std_cols"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If you have performed the mean normalization correctly, then the average of all the elements in $X_{\\tiny{\\mbox{norm}}}$ should be close to zero, and they should be evenly distributed in some small interval around zero. You can verify this by filing the code below:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[-0.98470495 -0.83353451 -0.1269568  ...  0.64394134  0.27955168\n",
+      "   1.00560212]\n",
+      " [ 0.80839481  1.06663148  0.96855375 ... -1.70543854 -1.54856265\n",
+      "   1.26300002]\n",
+      " [ 0.72540613  1.41811958  0.16726603 ...  0.75683901  0.8145927\n",
+      "  -1.49561908]\n",
+      " ...\n",
+      " [-1.17517078 -0.34003101 -0.32866986 ...  0.85796208 -1.48642886\n",
+      "  -0.89845595]\n",
+      " [ 0.26420672  0.47655751  0.77796969 ...  0.45208455  0.22639277\n",
+      "  -0.44063089]\n",
+      " [-0.05278284 -0.8278539  -1.40679135 ... -1.43531526 -0.33971515\n",
+      "   0.56493691]]\n",
+      "[-1.75201016 -1.77651674 -1.76848372 -1.74661453 -1.64255206 -1.73416206\n",
+      " -1.79371586 -1.70096338 -1.79735463 -1.73028691 -1.76419606 -1.81447738\n",
+      " -1.7693546  -1.81826545 -1.69745595 -1.67940366 -1.7529691  -1.75322958\n",
+      " -1.70942015 -1.69810543]\n",
+      "[1.64440377 1.76179684 1.69819855 1.7746948  1.76062097 1.72398037\n",
+      " 1.68816811 1.73177825 1.7071817  1.69820791 1.69407828 1.69310313\n",
+      " 1.65723637 1.65687966 1.75415878 1.75107834 1.72265548 1.70019261\n",
+      " 1.74107662 1.72700264]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Print the average of all the values of X_norm\n",
+    "print(X_norm)\n",
+    "\n",
+    "# Print the average of the minimum value in each column of X_norm\n",
+    "print(X_norm.min(axis = 0))\n",
+    "\n",
+    "# Print the average of the maximum value in each column of X_norm\n",
+    "print(X_norm.max(axis = 0))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You should note that since $X$ was created using random integers, the above values will vary. \n",
+    "\n",
+    "# Data Separation\n",
+    "\n",
+    "After the data has been mean normalized, it is customary in machine learnig to split our dataset into three sets:\n",
+    "\n",
+    "1. A Training Set\n",
+    "2. A Cross Validation Set\n",
+    "3. A Test Set\n",
+    "\n",
+    "The dataset is usually divided such that the Training Set contains 60% of the data, the Cross Validation Set contains 20% of the data, and the Test Set contains 20% of the data. \n",
+    "\n",
+    "In this part of the lab you will separate `X_norm` into a Training Set, Cross Validation Set, and a Test Set. Each data set will contain rows of `X_norm` chosen at random, making sure that we don't pick the same row twice. This will guarantee that all the rows of `X_norm` are chosen and randomly distributed among the three new sets.\n",
+    "\n",
+    "You will start by creating a rank 1 ndarray that contains a random permutation of the row indices of `X_norm`. You can do this by using the `np.random.permutation()` function. The `np.random.permutation(N)` function creates a random permutation of integers from 0 to `N - 1`. Let's see an example:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([0, 1, 3, 4, 2])"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# We create a random permutation of integers 0 to 4\n",
+    "np.random.permutation(5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# To Do\n",
+    "\n",
+    "In the space below create a rank 1 ndarray that contains a random permutation of the row indices of `X_norm`. You can do this in one line of code by extracting the number of rows of `X_norm` using the `shape` attribute and then passing it to the  `np.random.permutation()` function. Remember the `shape` attribute returns a tuple with two numbers in the form `(rows,columns)`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[660 155 175 168 179 269 143 611 426 739  20 424 402 547  57 760  93 285\n",
+      " 751 641 752 476 390 743 471 258 342 740 295 540 103 853 391 291 352 620\n",
+      " 364  14 888 800  26 312 380 596 519  17 282 413 372  65 573  63 656 870\n",
+      " 835 341 990 892 363 802 478 172 777 535 568 579 603  74 526  92 208 948\n",
+      " 943 401 334 952 286  84 704 836 908  81 480 530 293 644 477 796 320 163\n",
+      " 978 927 559 953 565 481 524 340 728 156 200 191 605 995 216 464 551 582\n",
+      "  59 539 371 583 273  98 988 429 789 868 872 229 529 842 294 125 721 859\n",
+      " 246 375 178 520 665 367 358 837 574 844 177 860 621 709 845 321  38   7\n",
+      "  39 599 767 893  80 514 841 715 440  66 630 448 446 498 631 906 968 896\n",
+      " 824 920 820  79 902 693 225 880 435 716 195  82   0 935 305 301 209 394\n",
+      " 766 729 964 992 256 899 769 482  43 410 288 270 652 602 456 863 362 732\n",
+      " 495  64 572 894 233  33 354 723  96 338 300 790 808 970 851 434 701 897\n",
+      "  86 763 355 308 815 886 330 353 564 242 231 190 137 438 162 866 975 710\n",
+      " 852  70 578 591 160 822 628   9 403 774 205 532 505 326 832 560 556 483\n",
+      " 865 940 821  10 690 303 349 119 798 757 264 418 249 756 170  75 219 984\n",
+      " 965 617 393 780 492 794 657  56 188 905 126 370 184 311 773 546 781 939\n",
+      "  21 717 733 557 494 771 149 918 873 461 316 754 491 548 932 462 317 451\n",
+      " 758 718 658 849 804 396 809  61  73 633 817 277 627 196 307 702  37 437\n",
+      " 714 458 545 607 838 549 669 588 159 552 972 985 116 885 283  78 374 923\n",
+      " 666 509 944 425 522 323 840 221 267 538 663 158 601 925 389 274 887 593\n",
+      " 686 833 981 651 422 516   3 765 987  69 427 111 570 133 333 724 315  28\n",
+      " 329 958 977 720 463 825 127 337 980 664 445 444 102   4 598 806 878 194\n",
+      " 112 528 929 703 772 999  50 234 417 858 687 174 197 452 266 182  36 795\n",
+      " 379 753 313 187 169 867 496 622  51 474 623 675 508 550 151 350 561  22\n",
+      " 750 823 512 263 322 376 100 749 120 237 138  41 357 803 236 594  91  23\n",
+      "  13 343 610 387 166 959 877  47 442 762 745 890 199 647 945 365  48 327\n",
+      " 433 510 382 296 356 784 895 742 916 276 366 696 339 747 201  54 982 912\n",
+      " 115 360 712 117 525 635 744 609 576 150 331 915 874 672  31 956 468 230\n",
+      "   1 847 667 319 654  29 903 976 921 255 555 109  45 489  42 240 206 113\n",
+      " 730 673 222 731 632 204 786 991 922 891 460 889 846 876 931 299 449 682\n",
+      " 592 738  25  89 412 553  99 544 443 562 183 957 812   6 791 227 541 883\n",
+      " 217  87 181 634 616 989 994 705 764 405  85 662  49 351 778 801 737 414\n",
+      " 419 814 272 741 257 407 898 636  27 202  83  15 642 297 513 384 193 527\n",
+      " 951  19 164 260 420 692  52 466 782  30 499 439 793   8 171 306 775 612\n",
+      " 223 135 648 736 706 587 377 235 368 262 779  95 946 879 488 960 139 454\n",
+      " 974 147 289 118 694 504  62 457 157 212 537 136 165 973 484 585 558 722\n",
+      "  58 152 431 275 595 575 640  72 917 298 265 843 250 252 180 400 114 862\n",
+      " 725 586 146 310 432 430  44 727 937 830 699 523 904 383 643 271 309 810\n",
+      " 141  88 129 511 580 132 121 926  68 655 755 421 955 534 245 268 674 521\n",
+      " 554 834 761 131 697 914 735 328 107 517 901 332 831 479 287 590 608 882\n",
+      " 711 688 518 788 486 875 816  53 826 279 629 792 615 500 819 566 638 857\n",
+      " 453 884 490 207 203 861 797 241 436 406 348 910 106 145 708 325 907 805\n",
+      " 280 783  16 248 569 924 224 680 768 829 167 855 854 966 542 604  32 473\n",
+      " 936 361 173 408 101 220 637 967 828 911 645 962 105 404 969 947 850 671\n",
+      " 942 577 533 423 261 290 244   5 543 864 726 302 502 239 304 485 996 124\n",
+      " 226 470 346 983 813 700 698   2 827 465 411 613 398 359 919 681 683 189\n",
+      " 148 536 247 661  55 335 161  97 373 600  35 618 493 571 385  60 475 415\n",
+      " 685 597 110 441 381 679 386 278 626 392 676 938 344 254 397 770 215 409\n",
+      " 253 501 318 503 154 108 677 719 678  24 487 653 650 695 531 284 856  94\n",
+      " 388 459 186 950 933 450 900 954  77 684 961 646 934 144 776 134 324 670\n",
+      " 746 507 369 378 336 153 639 839 232 515 447 748  46  76 211 395 345 986\n",
+      " 659 281 619 759 848 130 581 314 185  11 668 998 949 192 428  34 416 347\n",
+      " 176 506  18 871  90 691 787 238 123 807 713 213 104 913 811  71 909 228\n",
+      " 624 251 259  12 122 469 971 799 993 128 399 606 997 649 979 930 734 497\n",
+      " 928 785 707 563 140 142 869 963 243 210 589 689  40 567  67 625 218 941\n",
+      " 818 467 584 455 614 198 214 472 881 292]\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Create a rank 1 ndarray that contains a random permutation of the row indices of `X_norm`\n",
+    "row, col = X_norm.shape\n",
+    "row_indices = np.random.permutation(row)\n",
+    "print(row_indices)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now you can create the three datasets using the `row_indices` ndarray to select the rows that will go into each dataset. Rememeber that the Training Set contains 60% of the data, the Cross Validation Set contains 20% of the data, and the Test Set contains 20% of the data. Each set requires just one line of code to create. Fill in the code below"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Make any necessary calculations.\n",
+    "# You can save your calculations into variables to use later.\n",
+    "\n",
+    "\n",
+    "# Create a Training Set\n",
+    "X_train = X_norm[row_indices[0:600]]\n",
+    "\n",
+    "\n",
+    "# Create a Cross Validation Set\n",
+    "X_crossVal = X_norm[row_indices[600:800]]\n",
+    "\n",
+    "# Create a Test Set\n",
+    "X_test = X_norm[row_indices[800:1000]]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "If you performed the above calculations correctly, then `X_tain` should have 600 rows and 20 columns, `X_crossVal` should have 200 rows and 20 columns, and `X_test` should have 200 rows and 20 columns. You can verify this by filling the code below:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(600, 20)\n",
+      "(200, 20)\n",
+      "(200, 20)\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(X_train.shape)\n",
+    "print(X_crossVal.shape)\n",
+    "print(X_test.shape)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.6"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
